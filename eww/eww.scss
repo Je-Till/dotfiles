@@ -1,0 +1,170 @@
+//@~colorsbeg
+$V: #92200e;
+$LV: #9d6b57;
+$DV: #500d04;
+$M: #564d4b;
+$LM: #847272;
+$DM: #36201d;
+
+//@~colorsend
+$grey: #aaaaaa;
+$black: #000000;
+$red: #ff6565;
+$green: #b8cc52;
+$yellow: #e6c446;
+$blue: #68d4ff;
+$magenta: #ffa3aa;
+$cyan: #36a3d9;
+$white: #ffffff;
+
+$foreground: $LV;
+$foreground-alt: $M;
+$background: $DM;
+$background_blend: $grey;
+$highlight: $red;
+$highlight_alt: $white;
+
+$border-radius: 8px;
+$border-width: 2px;
+$border-style: solid;
+$border-color: $foreground-alt;
+
+* {
+  all: unset;
+}
+
+window {
+  background: $background;
+  color: $foreground;
+  border-radius: $border-radius;
+  border-width: $border-width;
+  border-style: $border-style;
+  border-color: $border-color;
+}
+
+.current {
+  color: $white;
+}
+
+.window_w {
+  .window_s {
+    // max-width: 50px;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
+  }
+}
+
+.bar {
+  // background-color: $background;
+  font-family: "Noto Sans";
+  font-size: 13px;
+  margin: 0 10px;
+}
+
+.todo_win_widget {
+    padding: 12px 10px 13px 10px;
+    margin: 0 5px;
+}
+
+.todo_win_add_icon:hover {
+  color: $highlight_alt;
+}
+
+.todo_win_undo_icon:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_repeating:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_repeating_cd:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_repeating_cd {
+  color: $background_blend;
+}
+
+.todo_button_timesince:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_timesince_cd:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_timesince_cd {
+  color: $background_blend;
+}
+.todo_button_onetime:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_onetime_cd:hover {
+  color: $highlight_alt;
+}
+
+.todo_button_onetime_cd {
+  color: $background_blend;
+}
+// [class*="todos"] {
+//   color: $red;
+// }
+
+.icon-module {
+  margin: 0 5px;
+  & > &__icon {
+    margin-right: 5px;
+    font-family: "Font Awesome 5 Free Solid";
+  }
+}
+
+// calendar
+.cal {
+  background-color: $background;
+
+  .cal-in {
+    padding: 0px 5px 0px 5px;
+    color: $foreground;
+    border-radius: $border-radius;
+    border-width: $border-width;
+    border-style: $border-style;
+    border-color: $border-color;
+
+    .cal {
+      &.highlight {
+        padding: 10px;
+      }
+
+      padding: 3px 3px 3px 3px;
+      margin-left: 5px;
+    }
+  }
+}
+
+calender {
+  color: $foreground;
+}
+calendar:selected {
+  color: $highlight;
+}
+
+calendar.header {
+  color: $foreground;
+  font-weight: bold;
+}
+
+calendar.button {
+  color: $foreground;
+}
+
+calendar.highlight {
+  color: $foreground;
+  font-weight: bold;
+}
+
+calendar:indeterminate {
+  color: $background_blend;
+}

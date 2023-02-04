@@ -1,0 +1,196 @@
+(defwindow bar
+  :monitor 0 
+  :stacking "fg"
+  :hexpand false
+  :vexpand false
+  :geometry (geometry :anchor "top center" :width "80%" :height "25px" :y 4 :x 0)
+  :focusable false
+  :exclusive true
+  (bar))
+
+(defwidget bar []
+  (box :orientation "h"
+       :space-evenly true
+       :class "bar"
+       (box :halign "start"
+            :spacing 15 
+            :space-evenly false
+            :hexpand false
+            (workspaces)
+            (window_w))
+       (box :halign "center"
+            :spacing 50
+            :hexpand false
+            :space-evenly false
+             (mpd))
+       (box :halign "end"
+            :spacing 15
+            :hexpand false
+            :space-evenly false
+            ; (disk)
+            ; (cpu)
+            ; (ram)
+            (vol_mpc)
+            (vol_alsa)
+            (todo)
+            (date)
+            (time))))
+
+
+(defpoll todo_num :interval "1m" "sh ~/.config/eww/scripts/todo.sh num")
+(defpoll todo_undo_button :interval "20h" "sh ~/.config/eww/scripts/spawn.sh todo_undo_button")
+(defpoll todo_onetime :interval "20h" "~/.config/eww/scripts/todo.sh get_onetime")
+(defpoll todo_repeating :interval "20h" "~/.config/eww/scripts/todo.sh get_repeating")
+(defpoll todo_timesince :interval "20h" "~/.config/eww/scripts/todo.sh get_timesince")
+(defpoll todo_repeating_time :interval "1m" :initial "{\"null\": \"data\"}" "sh ~/.config/eww/scripts/todo.sh get_repeating_time <~/.config/eww/scripts/todo_repeating")
+(defpoll todo_timesince_time :interval "1m" :initial "{\"null\": \"data\"}" "sh ~/.config/eww/scripts/todo.sh get_timesince_time <~/.config/eww/scripts/todo_timesince")
+(defpoll calendar_day :interval "20h" "date '+%d'")
+(defpoll calendar_year :interval "20h" "date '+%Y'")
+(defpoll time_poll :interval "1s" "date +%H:%M")
+(defpoll date_poll :interval "1m" "date +%d/%m/%Y")
+(deflisten workspaces :initial "[]" "bash ~/.config/eww/scripts/get-workspaces.sh")
+(deflisten current_workspace :initial "1" "bash ~/.config/eww/scripts/get-active-workspace.sh")
+(defpoll vol_alsa_poll :interval "1s" "~/.config/eww/scripts/vol_alsa.sh")
+(defpoll vol_mpc_poll :interval "1s" "~/.config/eww/scripts/vol_mpc.sh")
+(defpoll mpd_poll :interval "1s" "sh ~/.config/eww/scripts/mpd.sh") ; returns .title .time .icon
+; (defpoll get_mon :run-while false "~/.config/eww/scripts/get-mon.sh")
+
+(defwidget icon-module [icon ?class ?visible]
+  (box :class "${class} icon-module"
+       :orientation "h"
+       :halign "end"
+       :space-evenly false
+       :visible {visible ?: true} ; because the argument is optional
+    (label :class "icon-module__icon" :text "${icon}")
+    (children)))
+
+; TODO
+
+(defwidget todo []
+    (eventbox :onclick `./scripts/spawn.sh todo`
+  (icon-module :class "todo" :icon " " 
+      (label :text todo_num))))
+
+(defwidget todo_win_widget []
+  (box :class "todo_win_widget" :orientation "v" :halign "center" :valign "center" :spacing 8
+      :space-evenly false
+      (box :halign "start" :orientation "h" :spacing 12
+            :valign "start"
+            :space-evenly false
+            (todo_win_add_icon)
+            (literal :content todo_undo_button))
+      (box :halign "center" :valign "start" :orientation "v" :space-evenly false :spacing 8
+            (label :text "----- repeating -----")
+            (literal :content todo_repeating)
+            (label :text "----- time-since -----")
+            (literal :content todo_timesince)
+            (label :text "------ one-time ------")
+            (literal :content todo_onetime))))
+
+(defwidget todo_win_add_icon []
+  (eventbox
+    :space-evenly false
+    :active true
+    :class "todo_win_add_icon"
+    :onclick `./scripts/spawn.sh todo_add`
+      :width 20
+      :height 10
+      (label :text "NEW")))
+
+(defwidget todo_win_add_win_widget []
+	(box :class "todo_win_widget" :orientation "v"
+      (eventbox :onclick "./scripts/spawn.sh todo_add"
+      (input :onaccept "./scripts/todo.sh add '{}'"))))
+
+(defwindow todo_add_win
+  :monitor 0
+  :focusable true
+  :geometry (geometry :anchor "top right" :width "200px" :height "50px" :y 4 :x 400)
+  (todo_win_add_win_widget))
+
+(defwindow todo_win
+  :monitor 0
+  :focusable false
+  :geometry (geometry :anchor "top right" :width "50px" :height "50px" :y 4 :x 400)
+  (todo_win_widget))
+
+; DATE
+
+(defwidget cal []
+	(box :class "cal" :orientation "v"
+	(box :class "cal-in"
+	(calendar :class "cal" 
+			  :day calendar_day 
+			  :year calendar_year))))
+
+(defwindow calendar
+  :monitor 0
+  :geometry (geometry :anchor "top right" :width "270px" :height "60px" :y 4 :x 0)
+  (cal))
+
+(defwidget date []
+    (eventbox :onclick `./scripts/spawn.sh calendar`
+  (icon-module :class "date" :icon " " 
+      (label :text date_poll))))
+;
+(defwidget time []
+    (eventbox :onclick `./scripts/spawn.sh calendar`
+  (icon-module :class "time" :icon " " 
+    (label :text time_poll))))
+;
+; (defwidget cpu []
+;   (icon-module :class "cpu" :icon " " 
+;     (label :text "${round(EWW_CPU.avg, 0)}%"))) 
+
+; (defwidget disk []
+;   (icon-module :class "disk" :icon " " 
+;     (label :text "${round(EWW_DISK["/"].used_perc, 0)}%"))) 
+; (defwidget ram []
+;   (icon-module :class "ram" :icon " " :visible {EWW_RAM.used_mem_perc != ""}
+;     (label :text "${round(EWW_RAM.used_mem_perc, 0)}%")))
+;
+
+
+(defwidget mpd []
+    (eventbox :onclick `eww update mpd_poll="$(./scripts/mpd.sh toggle)"`
+              (icon-module :class "mpd" :icon "${mpd_poll.icon} "
+                (box :orientation "h" :spacing 15 :space-evenly "no"
+              (label :limit-width 70 :text "${mpd_poll.title}")
+              (label :text "${mpd_poll.time}")))))
+
+(defwidget vol_alsa []
+    (eventbox :onscroll `eww update vol_alsa_poll="$(./scripts/vol_alsa.sh {})"`
+              :onclick `eww update vol_alsa_poll="$(./scripts/vol_alsa.sh toggle)"`
+              (icon-module :class "vol" :icon "${vol_alsa_poll.icon} "
+              (label :text "${vol_alsa_poll.vol}"))))
+
+(defwidget vol_mpc []
+    (eventbox :onscroll `eww update vol_mpc_poll="$(./scripts/vol_mpc.sh {})"`
+              :onclick `eww update vol_mpc_poll="$(./scripts/vol_mpc.sh toggle)"`
+              (icon-module :class "vol" :icon "${vol_mpc_poll.icon} "
+              (label :text "${vol_mpc_poll.vol}"))))
+
+(defwidget workspaces [] ; display workspaces
+  (eventbox :onscroll "bash ~/.config/eww/scripts/change-active-workspace.sh {} ${current_workspace}" :class "workspaces-widget"
+    (box :space-evenly true
+      (for workspace in workspaces
+        (eventbox :onclick "hyprctl dispatch workspace ${workspace.id}"
+          (box :class "workspace-entry ${workspace.id == current_workspace ? "current" : ""} ${workspace.windows > 0 ? "occupied" : "empty"}"
+            (label :text "${workspace.id}")
+            )
+          )
+        )
+      )
+    )
+  )
+
+
+(deflisten window :initial "..." "bash ~/.config/eww/scripts/get-window-title.sh")
+(defwidget window_w [] ; displays title of active window
+  (box :class "window_w"
+    (label :limit-width 50 :text "${window}"
+            :class "window_s"
+      )
+    )
+  )
+  
